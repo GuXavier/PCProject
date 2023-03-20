@@ -38,13 +38,18 @@ get_name(AST) -> case AST of
         concat(Str2, ")")
 end.
 
+r_duplicates([])    -> [];
+r_duplicates([H|T]) -> [H | [X || X <- r_duplicates(T), X /= H]].
+
 %Basically the Main
 translateTo_LTS(AST) ->
-    Transitions = translateTo_LTS(AST, ""),
+    Temp = translateTo_LTS(AST, ""),
+    Transitions = r_duplicates(Temp),
     States = get_states(Transitions, []),
     Initial = hd(States),
-    LTS = {States, Transitions, Initial},
-    io:fwrite("~p~n",[LTS]).
+    {States, Transitions, Initial}.
+    
+    %io:fwrite("~p~n",[LTS]).
     %io:fwrite("~p~n",[Transitions]).
 
 %Generate the list of Transtition based on the AST
@@ -86,7 +91,3 @@ translateTo_LTS(AST, UpperChoiceState) -> case AST of
         end,
         LeftT ++ RightT        
 end.
-
-
-
-
